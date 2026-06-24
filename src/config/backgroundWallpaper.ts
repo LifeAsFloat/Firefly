@@ -1,10 +1,14 @@
-import type { BackgroundWallpaperConfig } from "@/types/config";
+import type { BackgroundWallpaperConfig } from "@/types/backgroundWallpaper";
 
 export const backgroundWallpaper: BackgroundWallpaperConfig = {
-	// 壁纸模式："banner" 横幅壁纸，"overlay" 全屏透明，"none" 纯色背景无壁纸
+	// 壁纸模式："banner" 横幅壁纸，"fullscreen" 全屏壁纸，"overlay" 全屏透明，"none" 纯色背景无壁纸
 	mode: "banner",
-	// 是否允许用户通过导航栏切换壁纸模式，设为false可提升性能（只渲染当前模式）
+	// 是否允许用户通过导航栏切换壁纸模式
+	// 且同时维护多种壁纸模式过于复杂（已经屎山代码），在切换时有时候可能会出现一些奇怪的过渡效果或者bug
+	// 推荐只选择自己喜欢的模式并关闭切换功能
 	switchable: true,
+	// 是否启用背景视频播放，配置后将在导航栏显示视频播放按钮
+	playerEnable: true,
 	/**
 	 * 背景图片配置
 	 * 图片路径支持三种格式：
@@ -56,14 +60,20 @@ export const backgroundWallpaper: BackgroundWallpaperConfig = {
 			"assets/images/MobileWallpaper/m5.avif",
 			"assets/images/MobileWallpaper/m6.avif",
 		],
+		// 背景视频播放地址
+		// 支持单个视频路径（字符串）或多个视频循环（数组）
+		// 支持远程视频URL，本地视频请放在 public/assets/videos/ 目录下
+		// playerUrl: "/assets/videos/firefly.mp4",
+		playerUrl: [
+			"https://www.image2url.com/r2/default/videos/1781765166391-f2ba6648-1597-40e0-9f0a-6768ae39e574.mp4",
+		],
 	},
-	// Banner模式特有配置
-	banner: {
-		// 图片位置
-		// 支持所有CSS object-position值，如: 'top', 'center', 'bottom', 'left top', 'right bottom', '25% 75%', '10px 20px'..
-		// 如果不知道怎么配置百分百之类的配置，推荐直接使用：'center'居中，'top'顶部居中，'bottom' 底部居中，'left'左侧居中，'right'右侧居中
-		position: "0% 20%",
-
+	// 横幅壁纸和全屏壁纸共享配置
+	common: {
+		// 横幅文字遮罩暗度，0-1之间，值越大越暗
+		dimOpacity: 0.2,
+		// 多视频播放模式："order" 顺序循环，"random" 随机切换（仅当 playerUrl 为数组时生效）
+		playerMode: "random",
 		// 主页横幅文字
 		homeText: {
 			// 是否启用主页横幅文字
@@ -98,44 +108,14 @@ export const backgroundWallpaper: BackgroundWallpaperConfig = {
 				pauseTime: 2000,
 			},
 		},
-		// 图片来源
-		credit: {
-			enable: {
-				// 桌面端显示横幅图片来源文本
-				desktop: true,
-				// 移动端显示横幅图片来源文本
-				mobile: true,
-			},
-			text: {
-				// 桌面端要显示的来源文本
-				desktop: "Pixiv - 晚晚喵",
-				// 移动端要显示的来源文本
-				mobile: "Pixiv - KiraraShss",
-			},
-			url: {
-				// 桌面端原始艺术品或艺术家页面的 URL 链接
-				desktop: "https://www.pixiv.net/users/108801776",
-				// 移动端原始艺术品或艺术家页面的 URL 链接
-				mobile: "https://www.pixiv.net/users/42715864",
-			},
-		},
-		// 横幅导航栏配置
+		// 导航栏配置
 		navbar: {
-			// 横幅导航栏透明模式："semi" 半透明，"full" 完全透明，"semifull" 动态透明
-			transparentMode: "semifull",
+			// 导航栏透明模式："semi" 半透明，"full" 完全透明，"semifull" 动态透明
+			transparentMode: "semi",
 			// 是否开启毛玻璃模糊效果，开启可能会影响页面性能，如果不开启则是半透明，请根据自己的喜好开启
 			enableBlur: true,
 			// 毛玻璃模糊度
-			blur: 10,
-		},
-		// 横幅图片轮播配置，仅在当配置多张图片时生效
-		carousel: {
-			// 是否启用横幅图片轮播；关闭时保持每次刷新随机显示一张
-			enable: true,
-			// 轮播切换间隔（毫秒）
-			interval: 5000,
-			// 是否允许用户通过控制面板切换横幅轮播
-			switchable: true,
+			blur: 5,
 		},
 		// 水波纹动画效果配置，开启会影响页面性能，请根据自己的喜好开启
 		waves: {
@@ -148,6 +128,37 @@ export const backgroundWallpaper: BackgroundWallpaperConfig = {
 			// 是否允许用户通过控制面板切换水波纹动画
 			switchable: true,
 		},
+		// 渐变过渡效果配置，当水波纹关闭时自动启用，提供壁纸底部到背景色的平滑过渡
+		gradient: {
+			enable: {
+				// 桌面端是否启用渐变过渡
+				desktop: true,
+				// 移动端是否启用渐变过渡
+				mobile: true,
+			},
+			// 渐变高度
+			height: "15vh",
+			// 是否允许用户通过控制面板切换渐变过渡
+			switchable: true,
+		},
+		// 壁纸轮播配置，横幅壁纸和全屏壁纸共享，仅在配置多张图片时生效
+		carousel: {
+			// 是否启用壁纸轮播；关闭时保持每次刷新随机显示一张
+			enable: false,
+			// 轮播切换间隔（毫秒）
+			interval: 5000,
+			// 过渡效果: 'fade' 渐变 | 'zoom' 缩放 | 'slide' 滑动 | 'kenburns' 旋转木马
+			transitionEffect: "zoom",
+			// 是否允许用户通过控制面板切换壁纸轮播
+			switchable: true,
+		},
+	},
+	// Banner模式特有配置
+	banner: {
+		// 图片位置
+		// 支持所有CSS object-position值，如: 'top', 'center', 'bottom', 'left top', 'right bottom', '25% 75%', '10px 20px'..
+		// 如果不知道怎么配置百分百之类的配置，推荐直接使用：'center'居中，'top'顶部居中，'bottom' 底部居中，'left'左侧居中，'right'右侧居中
+		position: "0% 20%",
 	},
 	// 全屏透明覆盖模式特有配置
 	overlay: {
@@ -165,5 +176,10 @@ export const backgroundWallpaper: BackgroundWallpaperConfig = {
 		blur: 10,
 		// 卡片透明度，0-1之间，值越小越透明
 		cardOpacity: 0.5,
+	},
+	// 全屏壁纸模式特有配置
+	fullscreen: {
+		// 图片位置
+		position: "center",
 	},
 };
